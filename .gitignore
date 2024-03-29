@@ -1,0 +1,7 @@
+.pyc
+__pycache__/
+.venv/
+tempCodeRunnerFile.py
+
+*-indev.*
+.env
