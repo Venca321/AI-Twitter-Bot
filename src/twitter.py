@@ -6,10 +6,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
-import time
 from dataclasses import dataclass, field
+import time, random
 
 
+DEBUG = True
 TWITTER_AUTH_COOKIE = "09eee779a30306bfc76832606c01bfaf9a1a2af1"
 PAGE_LOAD_WAIT = 2.5 # seconds
 
@@ -38,6 +39,17 @@ class Utils:
             return True
         except: 
             return False
+        
+    def write_input_by_chars(element:WebElement, text:str) -> None:
+        for character in text:
+            element.send_keys(character)
+            time.sleep(random.randint(15, 100)/920)
+
+    def write(element:WebElement, text:str) -> None:
+        text = text.split("\n")
+        for line in text:
+            Utils.write_input_by_chars(element, line)
+            element.send_keys(Keys.ENTER)
         
     def scroll_to_element(browser:WebDriver, element:WebElement, scrollMarginTop:int) -> None:
         #browser.execute_script('const y = arguments[0].getBoundingClientRect().top + window.pageYOffset - 10; windows.scrollTo({top: y, behavior: "smooth"});', element)
@@ -78,12 +90,19 @@ class Twitter:
         if for_you_tab_element:
             Utils.click_element(for_you_tab_element)
             time.sleep(PAGE_LOAD_WAIT)
-        
+
     class Posts:
         def __init__(self, browser:WebDriver) -> None:
             self.browser = browser
             self.posts:list[Post] = []
             self.post_location:int = -1
+
+        def create(self, text:str) -> None:
+            Utils.click_element(Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[2]/header/div/div/div/div[1]/div[3]/a/div"))
+            time.sleep(0.2)
+            Utils.write(Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[1]/div[2]/div/div/div/div/div/div/div/div/div/div/div/label/div[1]/div/div/div/div/div/div[2]/div"), text)
+            time.sleep(0.1)
+            Utils.click_element(Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/div/div/div/div[2]/div[2]/div/div/div/div[4]"))
 
         def get_post(self) -> Post:
             if len(self.posts) == 0: self.__load_posts()
@@ -112,7 +131,10 @@ class Twitter:
 
 
 if __name__ == "__main__":
-    twitter = Twitter(TWITTER_AUTH_COOKIE, headless=False)
-    for _ in range(25):
+    twitter = Twitter(TWITTER_AUTH_COOKIE, headless=(not DEBUG))
+
+    twitter.switch_to_following_tab()
+
+    for _ in range(3):
         print(twitter.posts.get_post())
         time.sleep(1)
