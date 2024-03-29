@@ -1,0 +1,2 @@
+OPEN_AI_API_KEY = "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"
+LANGUAGE_MODEL = "gpt-4-0125-preview"
