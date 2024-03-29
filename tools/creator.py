@@ -54,7 +54,8 @@ if __name__ == "__main__":
     if not save_prompt:
         print("[System]: Ok, goodbye!")
     
-    with open("config/prompts/name.txt", "w") as f: f.write(ai_name)
     with open("config/prompts/personality.txt", "w") as f: f.write(personality_prompt)
+    with open("config/prompts/name.txt", "w") as f: f.write(ai_name)
+    with open("config/prompts/bio.txt", "w") as f: f.write(generated_bio)
 
     print(f"\n[System]: Your prompt was saved. Please create the accounts for the AI influencer with this info:\n--------------------\n{Colors.BOLD}nickname:{Colors.NORMAL} {ai_name}\n{Colors.BOLD}bio:{Colors.NORMAL} {generated_bio}")
