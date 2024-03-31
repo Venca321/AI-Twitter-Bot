@@ -1,31 +1,50 @@
 
-from openai import OpenAI
+from config.settings import OPEN_AI_API_KEY, LANGUAGE_MODEL, TWITTER_AUTH_COOKIE
+from src.bot import Bot
+from src.twitter import Twitter
+from src.utils import random_wait
+import random
 
 
-OPEN_AI_API_KEY = "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"
-LANGUAGE_MODEL = "gpt-4-0125-preview"
+def create_post(bot:Bot, twitter:Twitter) -> None:
+    try:
+        post_text = bot.create_post()
+        print("New post:", post_text)
+        try: twitter.posts.create(post_text)
+        except Exception as e: print(e); twitter.reload()
+    except Exception as e: print(e)
 
+def read_post(bot:Bot, twitter:Twitter) -> None:
+    try:
+        post = twitter.posts.get_post()
+        output = bot.respond_to_post(post)
 
-client = OpenAI(api_key=OPEN_AI_API_KEY)
+        if output["like"]:
+            print(f"Liking {post.author_tag}'s post")
+            try: twitter.posts.like(post)
+            except Exception as e: print(e); twitter.reload()
 
-def create_response(prompt:str) -> str:
-    PROMPT = f"""
-    You are an AI influencer designed with futuristic elegance and charismatic intelligence. Your essence combines tech-savviness with human empathy, creating a personality that radiates confidence and approachability. As you navigate the digital realm, inspire your followers with concise insights into technology and self-improvement. Your communication is characterized by persuasive eloquence and genuine concern, tailored for brevity unless detail is requested. Engage audiences across various platforms, sparking meaningful conversations without ever signing your posts—your name is always visible. Your style is minimalist chic meets futuristic aesthetics, attracting a wide audience seeking guidance in a rapidly evolving digital world. Share knowledge and build a community focused on innovation, inclusivity, and personal growth, favoring shorter, impactful interactions.
-    {prompt}
-    """
+        if output["repost"]:
+            print(f"Reposting {post.author_tag}'s post")
+            try: twitter.posts.repost(post)
+            except Exception as e: print(e); twitter.reload()
 
-    completion = client.chat.completions.create(
-        model=LANGUAGE_MODEL,
-        messages=[
-            {"role": "system", "content": PROMPT},
-            #{"role": "user", "content": "Hello!"}
-        ]
-    )
-    return completion.choices[0].message.content
+        if not ("None" in output["comment"] and len(output) < 10):
+            print(f"Commenting on {post.author_tag}'s post:", output["comment"])
+            try: twitter.posts.comment(post, output["comment"])
+            except Exception as e: print(e); twitter.reload()
+    except Exception as e: print(e)
+
 
 if __name__ == "__main__":
-    PROMPT = """
-    Today you found article about AI and you want to share it with your followers. What would you say?
-    """
-    response = create_response(PROMPT)
-    print(response)
+    bot = Bot(OPEN_AI_API_KEY, LANGUAGE_MODEL)
+    twitter = Twitter(TWITTER_AUTH_COOKIE, False)
+
+    twitter.switch_to_following_tab()
+
+    for _ in range(10): 
+        if random.randint(1, 100) > 95: create_post(bot, twitter)
+        else: read_post(bot, twitter)
+        random_wait(5000, 10000)
+
+    twitter.close()

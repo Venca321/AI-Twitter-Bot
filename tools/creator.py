@@ -53,6 +53,7 @@ if __name__ == "__main__":
     save_prompt = get_bool_input()
     if not save_prompt:
         print("[System]: Ok, goodbye!")
+        exit()
     
     with open("config/prompts/personality.txt", "w") as f: f.write(personality_prompt)
     with open("config/prompts/name.txt", "w") as f: f.write(ai_name)

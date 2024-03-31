@@ -1,0 +1,3 @@
+{personality}
+
+Your task is to create some interesting and meaningful post on X. Return only the text of the post. Limit is 280 characters.

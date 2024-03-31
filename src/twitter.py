@@ -11,7 +11,6 @@ import time, random
 
 
 DEBUG = True
-TWITTER_AUTH_COOKIE = "09eee779a30306bfc76832606c01bfaf9a1a2af1"
 PAGE_LOAD_WAIT = 2.5 # seconds
 
 
@@ -79,6 +78,14 @@ class Twitter:
         # Wait for complete load
         time.sleep(PAGE_LOAD_WAIT)
 
+    def close(self) -> None:
+        self.browser.quit()
+
+    def reload(self) -> None:
+        self.browser.refresh()
+        self.posts = self.Posts(self.browser)
+        time.sleep(PAGE_LOAD_WAIT)
+
     def switch_to_following_tab(self) -> None:
         following_tab_element = Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[2]/main/div/div/div/div[1]/div/div[1]/div[1]/div/div/nav/div/div[2]/div/div[2]/a")
         if following_tab_element:
@@ -108,7 +115,13 @@ class Twitter:
             if len(self.posts) == 0: self.__load_posts()
             if self.post_location == -1: self.post_location = 0
             else: self.post_location += 1
-            if self.post_location == len(self.posts): self.__load_posts()
+            if self.post_location == len(self.posts): 
+                if len(self.posts) > 100:
+                    self.browser.refresh()
+                    self.posts = []
+                    self.post_location = 0
+                    time.sleep(5)
+                self.__load_posts()
 
             print(f"{self.post_location+1}/{len(self.posts)}")
 
@@ -119,22 +132,34 @@ class Twitter:
         def __load_posts(self) -> None:
             posts:list[WebElement] = self.browser.find_element(By.XPATH, "/html/body/div[1]/div/div/div[2]/main/div/div/div/div[1]/div/div[5]/div/section/div/div").find_elements(By.TAG_NAME, "article")
             for post in posts:
-                self.posts.append(
-                    Post(
-                        Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[1]/div[1]/div[1]/div/div/div[1]/div/a/div/div[1]/span/span"),
-                        Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[1]/div[1]/div[1]/div/div/div[2]/div/div[1]/a/div/span"),
-                        Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[1]/div[1]/div[1]/div/div/div[2]/div/div[3]/a/time"),
-                        Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[2]/div/span"),
-                        post
-                    )
-                )
+                try:
+                    author = Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[1]/div[1]/div[1]/div/div/div[1]/div/a/div/div[1]/span/span")
+                    author_tag = Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[1]/div[1]/div[1]/div/div/div[2]/div/div[1]/a/div/span")
+                    posted = Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[1]/div[1]/div[1]/div/div/div[2]/div/div[3]/a/time")
+                    text = Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[2]/div/span")
 
+                    seen = len(text) < 5
+                    for posts in self.posts:
+                        if posts.author == author and posts.text == text: seen = True; break
 
-if __name__ == "__main__":
-    twitter = Twitter(TWITTER_AUTH_COOKIE, headless=(not DEBUG))
+                    if not seen: self.posts.append(Post(author, author_tag, posted, text, post))
+                except: None
 
-    twitter.switch_to_following_tab()
+        def comment(self, post:Post, text:str) -> None:
+            comment_button = Utils.find_element(post.element, By.XPATH, "div/div/div[2]/div[2]/div[4]/div/div/div[1]/div")
+            if comment_button:
+                Utils.click_element(comment_button)
+                input_field = Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[2]/div/div/div/div[1]/div[2]/div/div/div/div/div/div/div/div/div/div/div/label/div[1]/div/div/div/div/div/div[2]/div")
+                if input_field:
+                    Utils.write(input_field, text)
+                    reply_button = Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[2]/div/div/div/div[2]/div[2]/div/div/div/div[2]")
+                    if reply_button: Utils.click_element(reply_button)
 
-    for _ in range(3):
-        print(twitter.posts.get_post())
-        time.sleep(1)
+        def like(self, post:Post) -> None:
+            like_button = Utils.find_element(post.element, By.XPATH, "div/div/div[2]/div[2]/div[4]/div/div/div[3]/div")
+            if like_button: Utils.click_element(like_button)
+
+        def repost(self, post:Post) -> None:
+            repost_button = Utils.find_element(post.element, By.XPATH, "div/div/div[2]/div[2]/div[4]/div/div/div[2]/div")
+            if repost_button: Utils.click_element(repost_button)
+
