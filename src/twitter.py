@@ -57,7 +57,7 @@ class Utils:
 
 
 class Twitter:
-    def __init__(self, auth_cookie:str, headless:bool=True) -> None:
+    def __init__(self, auth_cookie:str, user_tag:str, headless:bool=True) -> None:
         # Turn off the browser window if not needed for debugging
         options = webdriver.FirefoxOptions()
         if headless: options.add_argument("--headless")
@@ -67,7 +67,7 @@ class Twitter:
 
         # Variables
         self.auth_cookie = auth_cookie
-        self.posts = self.Posts(self.browser)
+        self.posts = self.Posts(self.browser, user_tag)
 
         # Load and add cookies
         self.browser.get("https://twitter.com/")
@@ -99,8 +99,9 @@ class Twitter:
             time.sleep(PAGE_LOAD_WAIT)
 
     class Posts:
-        def __init__(self, browser:WebDriver) -> None:
+        def __init__(self, browser:WebDriver, user_tag:str) -> None:
             self.browser = browser
+            self.user_tag = user_tag
             self.posts:list[Post] = []
             self.post_location:int = -1
 
@@ -139,6 +140,8 @@ class Twitter:
                     text = Utils.find_element_text(post, By.XPATH, "div/div/div[2]/div[2]/div[2]/div/span")
 
                     seen = len(text) < 5
+                    if author_tag == self.user_tag: seen = True
+
                     for posts in self.posts:
                         if posts.author == author and posts.text == text: seen = True; break
 
@@ -161,5 +164,8 @@ class Twitter:
 
         def repost(self, post:Post) -> None:
             repost_button = Utils.find_element(post.element, By.XPATH, "div/div/div[2]/div[2]/div[4]/div/div/div[2]/div")
-            if repost_button: Utils.click_element(repost_button)
+            if repost_button: 
+                Utils.click_element(repost_button)
+                repost_button = Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div[2]/div/div[3]/div/div/div/div")
+                if repost_button: Utils.click_element(repost_button)
 

@@ -1,5 +1,5 @@
 
-from config.settings import OPEN_AI_API_KEY, LANGUAGE_MODEL, TWITTER_AUTH_COOKIE
+from config.settings import OPEN_AI_API_KEY, LANGUAGE_MODEL, TWITTER_AUTH_COOKIE, TWITTER_USER_TAG
 from src.bot import Bot
 from src.twitter import Twitter
 from src.utils import random_wait
@@ -38,9 +38,7 @@ def read_post(bot:Bot, twitter:Twitter) -> None:
 
 if __name__ == "__main__":
     bot = Bot(OPEN_AI_API_KEY, LANGUAGE_MODEL)
-    twitter = Twitter(TWITTER_AUTH_COOKIE, False)
-
-    twitter.switch_to_following_tab()
+    twitter = Twitter(TWITTER_AUTH_COOKIE, TWITTER_USER_TAG, False)
 
     for _ in range(10): 
         if random.randint(1, 100) > 95: create_post(bot, twitter)

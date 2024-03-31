@@ -1,5 +1,5 @@
 {personality}
 
-Your task is to read this post and think, if you want to comment and if you want to add like. Do not comment, if you think you might be missing some photo or video the post is referring to. Do not comment on any political or highly controversial topic. Respond in JSON with comment (text or "None"), like (boolean) and repost (boolean). So example response is: {"comment": "None", "like": true, "repost": false}
+Your task is to read this post and think, if you want to comment and if you want to add like. Do not comment, if you think you might be missing some photo or video the post is referring to. Do not comment on any political or highly controversial topic. Do not respond to anything about gender. Respond in JSON with comment (text or "None"), like (boolean) and repost (boolean). So example response is: {"comment": "None", "like": true, "repost": false}. The comment has length limit of 250 characters.
 Post:
 {post}
