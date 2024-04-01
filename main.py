@@ -3,8 +3,11 @@ from config.settings import OPEN_AI_API_KEY, LANGUAGE_MODEL, TWITTER_AUTH_COOKIE
 from src.bot import Bot
 from src.twitter import Twitter
 from src.utils import random_wait, Colors
-import random, datetime
+import random, datetime, argparse
 
+parser = argparse.ArgumentParser(prog='AI-Influencer')
+parser.add_argument('-d', '--debug', action="store_true")
+DEBUG = parser.parse_args().debug
 
 WORKING_HOURS_START = datetime.time(7, 30, 0)
 WORKING_HOURS_END = datetime.time(22, 0, 0)
@@ -51,7 +54,7 @@ if __name__ == "__main__":
     while True:
         if are_working_hours():
             print(f"{Colors.WARNING}I'm back to work!{Colors.NORMAL}")
-            twitter = Twitter(TWITTER_AUTH_COOKIE, TWITTER_USER_TAG, False)
+            twitter = Twitter(TWITTER_AUTH_COOKIE, TWITTER_USER_TAG, (not DEBUG))
             for _ in range(random.randint(5, 30)): 
                 if random.randint(1, 10) == 10: create_post(bot, twitter)
                 else: read_post(bot, twitter)
