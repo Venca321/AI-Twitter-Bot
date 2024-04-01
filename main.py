@@ -3,8 +3,18 @@ from config.settings import OPEN_AI_API_KEY, LANGUAGE_MODEL, TWITTER_AUTH_COOKIE
 from src.bot import Bot
 from src.twitter import Twitter
 from src.utils import random_wait
-import random
+import random, datetime
 
+
+WORKING_HOURS_START = datetime.time(7, 30, 0)
+WORKING_HOURS_END = datetime.time(22, 0, 0)
+
+def are_working_hours():
+    x = datetime.datetime.now().time()
+    if WORKING_HOURS_START <= WORKING_HOURS_END:
+        return WORKING_HOURS_START <= x <= WORKING_HOURS_END
+    else:
+        return WORKING_HOURS_START <= x or x <= WORKING_HOURS_END
 
 def create_post(bot:Bot, twitter:Twitter) -> None:
     try:
@@ -38,11 +48,14 @@ def read_post(bot:Bot, twitter:Twitter) -> None:
 
 if __name__ == "__main__":
     bot = Bot(OPEN_AI_API_KEY, LANGUAGE_MODEL)
-    twitter = Twitter(TWITTER_AUTH_COOKIE, TWITTER_USER_TAG, False)
-
-    for _ in range(10): 
-        if random.randint(1, 100) > 95: create_post(bot, twitter)
-        else: read_post(bot, twitter)
-        random_wait(5000, 10000)
-
-    twitter.close()
+    while True:
+        if are_working_hours():
+            print("I'm back to work!")
+            twitter = Twitter(TWITTER_AUTH_COOKIE, TWITTER_USER_TAG, False)
+            for _ in range(random.randint(5, 30)): 
+                if random.randint(1, 10) == 10: create_post(bot, twitter)
+                else: read_post(bot, twitter)
+                random_wait(2500, 20000)
+            twitter.close()
+            print("Going AFK...")
+        random_wait(1000*60*30, 1000*60*30*2.5)

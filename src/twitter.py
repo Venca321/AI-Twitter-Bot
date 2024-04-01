@@ -152,9 +152,11 @@ class Twitter:
             comment_button = Utils.find_element(post.element, By.XPATH, "div/div/div[2]/div[2]/div[4]/div/div/div[1]/div")
             if comment_button:
                 Utils.click_element(comment_button)
+                time.sleep(0.25)
                 input_field = Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[2]/div/div/div/div[1]/div[2]/div/div/div/div/div/div/div/div/div/div/div/label/div[1]/div/div/div/div/div/div[2]/div")
                 if input_field:
                     Utils.write(input_field, text)
+                    time.sleep(0.25)
                     reply_button = Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div/div[3]/div[2]/div[2]/div/div/div/div[2]/div[2]/div/div/div/div[2]")
                     if reply_button: Utils.click_element(reply_button)
 
@@ -166,6 +168,7 @@ class Twitter:
             repost_button = Utils.find_element(post.element, By.XPATH, "div/div/div[2]/div[2]/div[4]/div/div/div[2]/div")
             if repost_button: 
                 Utils.click_element(repost_button)
+                time.sleep(0.25)
                 repost_button = Utils.find_element(self.browser, By.XPATH, "/html/body/div[1]/div/div/div[1]/div[2]/div/div/div/div[2]/div/div[3]/div/div/div/div")
                 if repost_button: Utils.click_element(repost_button)
 

@@ -4,6 +4,7 @@ sys.path.append(f"{os.getcwd()}") # import fix
 from src.ai import Model, Prompts
 from config.settings import OPEN_AI_API_KEY, LANGUAGE_MODEL
 from src.utils import Colors
+import dotenv
 
 
 def get_input(valid_options:list[str]) -> str:
@@ -55,8 +56,12 @@ if __name__ == "__main__":
         print("[System]: Ok, goodbye!")
         exit()
     
-    with open("config/prompts/personality.txt", "w") as f: f.write(personality_prompt)
-    with open("config/prompts/name.txt", "w") as f: f.write(ai_name)
-    with open("config/prompts/bio.txt", "w") as f: f.write(generated_bio)
+    #with open("config/prompts/personality.txt", "w") as f: f.write(personality_prompt)
+    #with open("config/prompts/name.txt", "w") as f: f.write(ai_name)
+    #with open("config/prompts/bio.txt", "w") as f: f.write(generated_bio)
+
+    dotenv.set_key(".env", "AI_NAME", repr(ai_name))
+    dotenv.set_key(".env", "AI_BIO", repr(generated_bio))
+    dotenv.set_key(".env", "AI_PERSONALITY_PROMPT", repr(personality_prompt))
 
     print(f"\n[System]: Your prompt was saved. Please create the accounts for the AI influencer with this info:\n--------------------\n{Colors.BOLD}nickname:{Colors.NORMAL} {ai_name}\n{Colors.BOLD}bio:{Colors.NORMAL} {generated_bio}")

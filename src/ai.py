@@ -1,6 +1,6 @@
 
 from openai import OpenAI
-
+import dotenv, os
 
 
 class Model:
@@ -21,25 +21,25 @@ class Model:
 
 class Prompts:
     def personality() -> str:
-        with open("config/prompts/personality.txt", "r") as f:
-            return f.read()
+        try: return os.environ["AI_PERSONALITY_PROMPT"]
+        except: return dotenv.get_key(".env", "AI_PERSONALITY_PROMPT")
 
     def create_prompt() -> str:
-        with open("config/prompts/system/creator/create_prompt.txt", "r") as f:
+        with open("config/prompts/creator/create_prompt.txt", "r") as f:
             return f.read()
 
     def create_name() -> str:
-        with open("config/prompts/system/creator/create_name.txt", "r") as f:
+        with open("config/prompts/creator/create_name.txt", "r") as f:
             return f.read()
 
     def create_bio() -> str:
-        with open("config/prompts/system/creator/create_bio.txt", "r") as f:
+        with open("config/prompts/creator/create_bio.txt", "r") as f:
             return f.read()
         
     def create_post() -> str:
-        with open("config/prompts/system/create_post.txt", "r") as f:
+        with open("config/prompts/create_post.txt", "r") as f:
             return f.read()
 
     def respond_to_post() -> str:
-        with open("config/prompts/system/respond_to_post.txt", "r") as f:
+        with open("config/prompts/respond_to_post.txt", "r") as f:
             return f.read()

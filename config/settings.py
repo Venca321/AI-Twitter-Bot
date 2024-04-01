@@ -1,6 +1,11 @@
-LANGUAGE_MODEL = "gpt-4-0125-preview"
 
-OPEN_AI_API_KEY = "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"
+import dotenv, os
 
-TWITTER_USER_TAG = "@WisdomCircuit66"
-TWITTER_AUTH_COOKIE = "09eee779a30306bfc76832606c01bfaf9a1a2af1"
+try: LANGUAGE_MODEL = os.environ["LANGUAGE_MODEL"]
+except: LANGUAGE_MODEL = dotenv.get_key(".env", "LANGUAGE_MODEL")
+try: OPEN_AI_API_KEY = os.environ["OPEN_AI_API_KEY"]
+except: OPEN_AI_API_KEY = dotenv.get_key(".env", "OPEN_AI_API_KEY")
+try: TWITTER_USER_TAG = os.environ["TWITTER_USER_TAG"]
+except: TWITTER_USER_TAG = dotenv.get_key(".env", "TWITTER_USER_TAG")
+try: TWITTER_AUTH_COOKIE = os.environ["TWITTER_AUTH_COOKIE"]
+except: TWITTER_AUTH_COOKIE = dotenv.get_key(".env", "TWITTER_AUTH_COOKIE")
