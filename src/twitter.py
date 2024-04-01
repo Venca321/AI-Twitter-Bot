@@ -124,7 +124,7 @@ class Twitter:
                     time.sleep(5)
                 self.__load_posts()
 
-            print(f"{self.post_location+1}/{len(self.posts)}")
+            print(f"Reading post ({self.post_location+1}/{len(self.posts)})")
 
             post:Post = self.posts[self.post_location]
             Utils.scroll_to_element(self.browser, post.element, 64)
