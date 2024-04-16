@@ -1,8 +1,12 @@
 # AI-Twitter-Bot
-
-## About
 > :warning: **Educational purposes only**: This project is for educational purposes only, it is not intended for real-world use and we do not in any way encourage violations of the Twitter policy.
 
+## About
+This is a project that aims to show that AI can be connected to applications in other ways than through APIs. 
+
+This bot can automatically crawl Twitter posts, process them and like them, repost them and reply to them. It can also automatically create custom posts.
+
+At the same time, there is The Creator, which is a helper that is designed to help with prompting the AI bot.
 
 
 ## How to run
